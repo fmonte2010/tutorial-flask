@@ -31,7 +31,7 @@ def post_form():
     form = PostForm()
     if form.validate_on_submit():
         title = form.title.data
-        title_slug = form.title_slug.data
+        #title_slug = form.title_slug.data
         content = form.content.data
         post = Post(user_id=current_user.id, title=title, content=content)
         post.save()
@@ -54,7 +54,7 @@ def update_post_form(post_id):
     if form.validate_on_submit():
         # Actualiza los campos del post existente
         post.title = form.title.data
-        post.title_slug = form.title_slug.data
+        #post.title_slug = form.title_slug.data
         post.content = form.content.data
         post.save()
         logger.info(f'Guardando el post {post_id}')

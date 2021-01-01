@@ -25,3 +25,6 @@ DONT_REPLY_FROM_EMAIL = 'dirección from'
 ADMINS = ('fmonte@golifesaver.com', )
 MAIL_USE_TLS = True
 MAIL_DEBUG = False
+
+# Items por pagina en la paginacion de post
+ITEMS_PER_PAGE = 3

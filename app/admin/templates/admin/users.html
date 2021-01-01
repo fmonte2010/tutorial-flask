@@ -10,4 +10,5 @@
         <li><a href="{{ url_for('admin.update_user_form', user_id=user.id) }}">{{ user.name }}</a> (Admin: {{ user.is_admin}})</li>
     {% endfor %}
     </ul>
+    <div>¿Crear nuevo usuario? <a href="{{ url_for('auth.show_new_signup_form') }}">Nuevo Usuario</a></div>
 {% endblock %}
