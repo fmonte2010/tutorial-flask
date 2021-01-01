@@ -1,8 +1,10 @@
+from flask import url_for
 from flask_login import UserMixin
 from slugify import slugify
 from sqlalchemy.exc import IntegrityError
 
 from app import db
+import datetime
 
 class Post(db.Model):
     id = db.Column(db.Integer, primary_key=True)
@@ -10,9 +12,11 @@ class Post(db.Model):
     title = db.Column(db.String(256), nullable=False)
     title_slug = db.Column(db.String(256), unique=True, nullable=False)
     content = db.Column(db.Text)
-    
+    created = db.Column(db.DateTime, default=datetime.datetime.utcnow)
+
     def __repr__(self):
         return f'<Post {self.title}>'
+
     def save(self):
         if not self.id:
             db.session.add(self)
@@ -27,11 +31,23 @@ class Post(db.Model):
             except IntegrityError:
                 count += 1
                 self.title_slug = f'{slugify(self.title)}-{count}'
-    def public_url(self):
-        return url_for('show_post', slug=self.title_slug)
+
+# Comentado para mejoras...
+#    def public_url(self):
+#        return url_for('public.show_post', slug=self.title_slug)
+
+    def delete(self):
+        db.session.delete(self)
+        db.session.commit()
+
+    @staticmethod
+    def get_by_id(id):
+        return Post.query.get(id)
+
     @staticmethod
     def get_by_slug(slug):
         return Post.query.filter_by(title_slug=slug).first()
+
     @staticmethod
     def get_all():
         return Post.query.all()
