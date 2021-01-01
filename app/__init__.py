@@ -2,11 +2,14 @@ from flask import Flask, render_template
 from flask_login import LoginManager
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
+from flask_mail import Mail
+
 import logging
 
 login_manager = LoginManager()
 db = SQLAlchemy()
 migrate = Migrate()  # Se crea un objeto de tipo Migrate
+mail = Mail()  # Instanciamos un objeto de tipo Mail
 
 def create_app(settings_module):
     app = Flask(__name__, instance_relative_config=True)
@@ -26,6 +29,10 @@ def create_app(settings_module):
     login_manager.login_view = "auth.login"
     db.init_app(app)
     migrate.init_app(app, db)  # Se inicializa el objeto migrate
+    mail.init_app(app)  # Inicializamos el objeto mail
+
+    # Registro de los filtros
+    register_filters(app)
 
     # Registro de los Blueprints
     from .auth import auth_bp
@@ -39,6 +46,11 @@ def create_app(settings_module):
     register_error_handlers(app)
 
     return app
+
+from app.common.filters import format_datetime
+
+def register_filters(app):
+    app.jinja_env.filters['datetime'] = format_datetime
 
 def register_error_handlers(app):
     @app.errorhandler(500)
