@@ -1,5 +1,6 @@
-from flask import render_template, redirect, url_for, abort
+from flask import abort, current_app, render_template, redirect, url_for, request
 from flask_login import login_required, current_user
+from werkzeug.utils import secure_filename
 
 from app.models import Post
 
@@ -7,6 +8,7 @@ from . import admin_bp
 from .forms import PostForm
 from app.auth.decorators import admin_required
 import logging
+import os
 
 logger = logging.getLogger(__name__)
 
@@ -33,7 +35,17 @@ def post_form():
         title = form.title.data
         #title_slug = form.title_slug.data
         content = form.content.data
+        file = form.post_image.data
+        image_name = None
+        # Comprueba si la petición contiene la parte del fichero
+        if file:
+            image_name = secure_filename(file.filename)
+            images_dir = current_app.config['POSTS_IMAGES_DIR']
+            os.makedirs(images_dir, exist_ok=True)
+            file_path = os.path.join(images_dir, image_name)
+            file.save(file_path)
         post = Post(user_id=current_user.id, title=title, content=content)
+        post.image_name = image_name
         post.save()
         logger.info(f'Guardando nuevo post {title}')
         return redirect(url_for('admin.list_posts'))
@@ -56,6 +68,16 @@ def update_post_form(post_id):
         post.title = form.title.data
         #post.title_slug = form.title_slug.data
         post.content = form.content.data
+        file = form.post_image.data
+        image_name = None
+        # Comprueba si la petición contiene la parte del fichero
+        if file:
+            image_name = secure_filename(file.filename)
+            images_dir = current_app.config['POSTS_IMAGES_DIR']
+            os.makedirs(images_dir, exist_ok=True)
+            file_path = os.path.join(images_dir, image_name)
+            file.save(file_path)
+        post.image_name = image_name
         post.save()
         logger.info(f'Guardando el post {post_id}')
         return redirect(url_for('admin.list_posts'))
